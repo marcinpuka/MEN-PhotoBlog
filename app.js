@@ -45,14 +45,17 @@ var port = process.env.PORT || 3006;
 //--- Photo Schema ---//
 var photoSchema = new mongoose.Schema({
     title: String,
-    image: String
+    image: String, 
+    description: String
 }); 
 var Photo = mongoose.model("Photo", photoSchema);
 
 //Photo.create(
 //    {
 //        title: "Salmon Creek",
-//        image: "https://farm5.staticflickr.com/4150/4832531195_9a9934b372.jpg"
+//        image: "https://farm5.staticflickr.com/4150/4832531195_9a9934b372.jpg", 
+//        description: "This is a huge granite hill.", 
+//
 //    }
 //, (err, doc) => {
 //    if(err){
@@ -66,31 +69,39 @@ var Photo = mongoose.model("Photo", photoSchema);
 
 
 //--- Routes ---//
+
+//--- landing page ---//
 app.get("/", (req, res) => {
     res.render("landing");
 });
 
+
+//--- INDEX ---//
 app.get("/photos", (req, res) => {
     Photo.find({}, (err, photos) => {
        if(err) {
            console.log(err);
        } else {
-           res.render("photos", {photos: photos});
+           res.render("index", {photos: photos});
        }
     });
 });
 
+
+//--- NEW ---//
 app.get("/photos/new", (req, res) => {
     res.render("new");
 });
 
 
+//--- CREATE ---//
 app.post("/photos", (req, res) => {
    var title = req.body.title;
    var image = req.body.image;
    var newPhoto = {
        title: title, 
-       image: image
+       image: image, 
+       description: String
    };
   Photo.create(newPhoto, (err, newlyCreated) => {
      if(err){
@@ -100,6 +111,19 @@ app.post("/photos", (req, res) => {
      }
   });
 });
+
+
+//--- SHOW ---//
+app.get("/photos/:id", (req, res) => {
+   Photo.findById(req.params.id, (err, foundPhoto) => {
+      if(err){
+          console.log(err);
+      }  else {
+          res.render("show", {foundPhoto: foundPhoto});
+      }
+   });
+});
+
 
 
 app.listen(port, () => {

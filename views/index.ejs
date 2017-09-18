@@ -25,8 +25,12 @@
                         <div class="thumbnail">
                             <img src="<%= photo.image %>">
                             <div class="caption">
-                                <%= photo.title %>
+                                <h4><%= photo.title %></h4>
                             </div>
+                            <p>
+                                <a href="/photos/<%= photo._id %>" class="btn btn-primary">More Info</a>
+                            </p>                         
+
                         </div>                       
                     </div>
                     <% }); %>
