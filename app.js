@@ -1,8 +1,12 @@
 var express = require("express"), 
     bodyParser = require("body-parser"),
     app = express(), 
-    mongoose = require("mongoose") 
+    mongoose = require("mongoose"), 
+    Photo = require("./models/photo"), 
+    seedDB = require("./seeds");
 
+
+seedDB();
 
 //---DB Config---//
 mongoose.Promise = global.Promise;
@@ -42,13 +46,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 var port = process.env.PORT || 3006;
 
 
-//--- Photo Schema ---//
-var photoSchema = new mongoose.Schema({
-    title: String,
-    image: String, 
-    description: String
-}); 
-var Photo = mongoose.model("Photo", photoSchema);
 
 //Photo.create(
 //    {
