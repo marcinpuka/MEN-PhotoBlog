@@ -1,0 +1,18 @@
+<% include ../partials/header %>
+
+<h1><%= foundPhoto.title %> </h1>
+
+<p> <img src=" <%= foundPhoto.image %>"></p>
+
+<p><%= foundPhoto.description %></p>
+
+<p>
+    <a class="btn btn-success" href="/photos/<%= foundPhoto._id %>/comments/new">Add a New Comment</a>
+</p>
+
+
+<% foundPhoto.comments.forEach((comment) => { %>
+    <p> <strong> <%= comment.author%> </strong> - <%= comment.text %> </p>
+<% }) %>
+
+<% include ../partials/footer %>
