@@ -1,10 +1,13 @@
-const express = require("express"),
-    bodyParser = require("body-parser"),
-    app = express(),
-    mongoose = require("mongoose"),
-    Photo = require("./models/photo"),
-    Comment = require("./models/comment"),
-    seedDB = require("./seeds")
+const   express             = require("express"),
+        bodyParser          = require("body-parser"),
+        app                 = express(),
+        mongoose            = require("mongoose"),
+        Photo               = require("./models/photo"),
+        Comment             = require("./models/comment"),
+        seedDB              = require("./seeds"), 
+        passport            = require("passport"), 
+        LocalStrategy       = require("passport-local"), 
+        User                = require("./models/user")
 
 
 seedDB();
@@ -14,41 +17,31 @@ mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/photos", {
     useMongoClient: true
 });
-
-//--- STATIC DATA ---//
-//var photos = [
-//    {
-//        title: "Salmon Creek",
-//        image: "https://farm5.staticflickr.com/4150/4832531195_9a9934b372.jpg"
-//    },
-//    {
-//        title: "Granite Hill",
-//        image: "https://farm2.staticflickr.com/1076/826745086_e1c145c054.jpg"
-//    },
-//    {
-//        title: "Beaver Lake",
-//        image: "https://farm5.staticflickr.com/4080/4938516049_eef5cbc734.jpg"
-//    }, 
-//        {
-//        title: "Salmon Creek",
-//        image: "https://farm5.staticflickr.com/4150/4832531195_9a9934b372.jpg"
-//    },
-//    {
-//        title: "Granite Hill",
-//        image: "https://farm2.staticflickr.com/1076/826745086_e1c145c054.jpg"
-//    },
-//    {
-//        title: "Beaver Lake",
-//        image: "https://farm5.staticflickr.com/4080/4938516049_eef5cbc734.jpg"
-//    }
-//];
-
-
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-var port = process.env.PORT || 3006;
+app.use(express.static(__dirname + "/public"));
+
+//--- Passport ---//
+app.use(require("express-session")({
+    secret: "Robiestronyjakszalony", 
+    resave: false, 
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//--- locals ---//
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
+});
+
+var port = process.env.PORT || 3001;
 
 
 
@@ -85,7 +78,8 @@ app.get("/photos", (req, res) => {
             console.log(err);
         } else {
             res.render("photos/index", {
-                photos: photos
+                photos: photos, 
+                currentUser: req.user
             });
         }
     });
@@ -132,7 +126,7 @@ app.get("/photos/:id", (req, res) => {
 });
 
 //--- COMMENTS ROUTES ---//
-app.get("/photos/:id/comments/new", (req, res) => {
+app.get("/photos/:id/comments/new", isLoggedIn, (req, res) => {
     Photo.findById(req.params.id, (err, photo) => {
         if (err) {
             console.log(err);
@@ -144,7 +138,7 @@ app.get("/photos/:id/comments/new", (req, res) => {
     });
 });
 
-app.post("/photos/:id/comments", (req, res) => {
+app.post("/photos/:id/comments", isLoggedIn,(req, res) => {
     Photo.findById(req.params.id, (err, photo) => {
         if (err) {
             console.log(err);
@@ -166,8 +160,49 @@ app.post("/photos/:id/comments", (req, res) => {
 
 });
 
+// --- AUTH ROUTES ---//
+app.get("/register", (req, res) => {
+    res.render("register");
+});
 
+app.post("/register", (req, res) => {
+     var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, (err, user) => {
+        if(err){
+            console.log(err);
+            return res.render("register");
+        } 
+        passport.authenticate("local")(req, res, () => {
+            res.redirect("/photos");
+        });
+    });
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
+app.post("/login", passport.authenticate("local", 
+    {
+        successRedirect: "/photos", 
+        failureRedirect: "/login"
+    }), (req, res) => {
+
+    }
+);
+
+app.get("/logout", (req, res) => {
+    req.logout();
+    res.redirect("/photos");
+});
+
+function isLoggedIn (req, res, next) {
+    if(req.isAuthenticated()){
+        return next();
+    } 
+    res.redirect("/login");
+}
 
 app.listen(port, () => {
-    console.log("Serving demo on port 3006");
+    console.log(`Serving demo on port ${port}`);
 });

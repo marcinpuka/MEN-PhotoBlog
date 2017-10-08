@@ -1,18 +1,47 @@
 <% include ../partials/header %>
 
-<h1><%= foundPhoto.title %> </h1>
+    <div class="container">
+        <div class="col-md-3">
+            <p class="lead">Yelp Camp</p>
+            <div class="list-group">
+                <li class="list-group active">Info 1</li>
+                <li class="list-group">Info 2</li>
+                <li class="list-group">Info 3</li>
+            </div>
+        </div>
 
-<p> <img src=" <%= foundPhoto.image %>"></p>
+        <div class="col-md-9">
+            <div class="thumbnail">
+                <img class="img-responsive" src=" <%= foundPhoto.image %>">
+                <div class="caption-full">
+                    <h4>
+                        <a>
+                            <%= foundPhoto.title %>
+                        </a>
+                    </h4>
+                    <p>
+                        <%= foundPhoto.description %>
+                    </p>
+                </div>
+            </div>
+            <div class="well">
+                <div class="text-right">
+                    <a class="btn btn-success" href="/photos/<%= foundPhoto._id %>/comments/new">Add a New Comment</a>
+                </div>
+                <hr>
+                <% foundPhoto.comments.forEach((comment) => { %>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong><%= comment.author%></strong>
+                                <span class="pull-right">10 days ago</span>
+                                <p>
+                                    <%= comment.text %>
+                                </p>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
 
-<p><%= foundPhoto.description %></p>
-
-<p>
-    <a class="btn btn-success" href="/photos/<%= foundPhoto._id %>/comments/new">Add a New Comment</a>
-</p>
-
-
-<% foundPhoto.comments.forEach((comment) => { %>
-    <p> <strong> <%= comment.author%> </strong> - <%= comment.text %> </p>
-<% }) %>
-
-<% include ../partials/footer %>
+    <% include ../partials/footer %>
