@@ -23,10 +23,12 @@
                         <%= foundPhoto.description %>
                     </p>
                     <p> <em>Submitted By <%= foundPhoto.author.username %></em></p>
+                    <% if (currentUser && foundPhoto.author.id.equals(currentUser._id)) {%>
                     <a class="btn btn-warning" href="/photos/<%= foundPhoto._id %>/edit">Edit</a>
-                    <form action="/photos/<%= foundPhoto._id %>?_method=DELETE" method="POST">
+                    <form id="delete-form" action="/photos/<%= foundPhoto._id %>?_method=DELETE" method="POST">
                         <button class="btn btn-danger">Delete</button>
                     </form>
+                    <% } %>
                 </div>
             </div>
             <div class="well">
@@ -42,6 +44,8 @@
                                 <p>
                                     <%= comment.text %>
                                 </p>
+                            <a class="btn btn-xs btn-warning" 
+                            href="/photos/<%= foundPhoto._id %>/comments/<%= comment._id %>/edit">Edit</a>
                         </div>
                     </div>
                 <% }) %>
