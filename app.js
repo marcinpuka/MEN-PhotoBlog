@@ -21,7 +21,8 @@ const   commentRoutes       = require("./routes/comments"),
 
 //---DB Config---//
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/photos", {
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/photos", {
     useMongoClient: true
 });
 app.set("view engine", "ejs");
