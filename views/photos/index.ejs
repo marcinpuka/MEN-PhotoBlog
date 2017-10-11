@@ -7,7 +7,7 @@
         <header class="jumbotron">
             <div class="container">
                 <h1>Welcome to Photoblog!</h1>
-                <p>View our hand-picked photos from all over the world.</p>
+                <p><i class="fa fa-camera"></i>View our hand-picked photos from all over the world.</p>
                 <p>
                     <a class="btn btn-primary btn-lg" href="/photos/new">Add a New Photo</a>
                 </p>
@@ -24,9 +24,10 @@
                             <img src="<%= photo.image %>">
                             <div class="caption">
                                 <h4><%= photo.title %></h4>
+                                <h4>By <%= photo.author.username %></h4>
                             </div>
                             <p>
-                                <a href="/photos/<%= photo._id %>" class="btn btn-primary">More Info</a>
+                                <a href="/photos/<%= photo._id %>" class="btn btn-primary">More Details</a>
                             </p>                         
 
                         </div>                       

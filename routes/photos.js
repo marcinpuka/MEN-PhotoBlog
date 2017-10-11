@@ -1,6 +1,7 @@
-const express = require("express"),
-    router = express.Router(),
-    Photo = require("../models/photo")
+const express           = require("express"),
+    router              = express.Router(),
+    Photo               = require("../models/photo"),
+    middleware          = require("../middleware")
 
 
 //--- INDEX ---//
@@ -19,13 +20,13 @@ router.get("/", (req, res) => {
 
 
 //--- NEW ---//
-router.get("/new", isLoggedIn, (req, res) => {
+router.get("/new", middleware.isLoggedIn, (req, res) => {
     res.render("photos/new");
 });
 
 
 //--- CREATE ---//
-router.post("/", isLoggedIn, (req, res) => {
+router.post("/", middleware.isLoggedIn, (req, res) => {
     var title = req.body.title;
     var image = req.body.image;
     var description = req.body.description;
@@ -55,7 +56,6 @@ router.get("/:id", (req, res) => {
         if (err) {
             console.log(err);
         } else {
-            console.log(foundPhoto);
             res.render("photos/show", {
                 foundPhoto: foundPhoto
             });
@@ -64,7 +64,7 @@ router.get("/:id", (req, res) => {
 });
 
 //--- EDIT PHOTO ---//
-router.get("/:id/edit", checkPhotoOwnership, (req, res) => {
+router.get("/:id/edit", middleware.checkPhotoOwnership, (req, res) => {
     Campground.findById(req.params.id, (err, foundCampground) => {
         res.render("campgrounds/edit", {
             campground: foundCampground
@@ -73,7 +73,7 @@ router.get("/:id/edit", checkPhotoOwnership, (req, res) => {
 });
 
 //--- UPDATE PHOTO ROUTE ---//
-router.put("/:id", checkPhotoOwnership,(req, res) => {
+router.put("/:id", middleware.checkPhotoOwnership,(req, res) => {
     Photo.findByIdAndUpdate(req.params.id, req.body.photo, (err, updated) => {
         if (err) {
             res.redirect("/photos");
@@ -84,7 +84,7 @@ router.put("/:id", checkPhotoOwnership,(req, res) => {
 });
 
 //--- DESTROY ---//
-router.delete("/:id", checkPhotoOwnership,(req, res) => {
+router.delete("/:id", middleware.checkPhotoOwnership,(req, res) => {
     Photo.findByIdAndRemove(req.params.id, (err) => {
         if (err) {
             res.redirect("/photos");
@@ -94,31 +94,6 @@ router.delete("/:id", checkPhotoOwnership,(req, res) => {
     });
 });
 
-//--- Check Ownership ---//
-function checkPhotoOwnership(req, res, next) {
-    if (req.isAuthenticated()) {
-        Photo.findById(req.params.id, (err, foundPhoto) => {
-            if (err) {
-                res.redirect("back");
-            } else {
-                if (foundPhoto.author.id.equals(req.user._id)) {
-                    next();
-                } else {
-                    res.redirect("back");
-                }
-            }
-        });
-    } else {
-        res.redirect("back");
-    }
-}
 
-
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
 
 module.exports = router;

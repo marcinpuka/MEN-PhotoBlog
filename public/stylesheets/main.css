@@ -10,6 +10,15 @@
     padding: 9px;
 }
 
-#delete-form {
+.delete-form {
     display: inline;
+}
+
+.navbar-nav>li>a {
+    padding: 15px 10px 0px 10px;
+}
+
+#signed-as {
+    padding: 15px;
+    color: #777;
 }

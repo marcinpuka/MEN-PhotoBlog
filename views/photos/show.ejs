@@ -2,7 +2,7 @@
 
     <div class="container">
         <div class="col-md-3">
-            <p class="lead">Yelp Camp</p>
+            <p class="lead">Placeholder</p>
             <div class="list-group">
                 <li class="list-group active">Info 1</li>
                 <li class="list-group">Info 2</li>
@@ -24,11 +24,11 @@
                     </p>
                     <p> <em>Submitted By <%= foundPhoto.author.username %></em></p>
                     <% if (currentUser && foundPhoto.author.id.equals(currentUser._id)) {%>
-                    <a class="btn btn-warning" href="/photos/<%= foundPhoto._id %>/edit">Edit</a>
-                    <form id="delete-form" action="/photos/<%= foundPhoto._id %>?_method=DELETE" method="POST">
-                        <button class="btn btn-danger">Delete</button>
-                    </form>
-                    <% } %>
+                        <a class="btn btn-warning" href="/photos/<%= foundPhoto._id %>/edit">Edit</a>
+                        <form class="delete-form" action="/photos/<%= foundPhoto._id %>?_method=DELETE" method="POST">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                        <% } %>
                 </div>
             </div>
             <div class="well">
@@ -40,15 +40,19 @@
                     <div class="row">
                         <div class="col-md-12">
                             <strong><%= comment.author.username%></strong>
-                                <span class="pull-right">10 days ago</span>
-                                <p>
-                                    <%= comment.text %>
-                                </p>
-                            <a class="btn btn-xs btn-warning" 
-                            href="/photos/<%= foundPhoto._id %>/comments/<%= comment._id %>/edit">Edit</a>
+                            <span class="pull-right">10 days ago</span>
+                            <p>
+                                <%= comment.text %>
+                            </p>
+                            <% if (currentUser && comment.author.id.equals(currentUser._id)) {%>
+                                <a class="btn btn-xs btn-warning" href="/photos/<%= foundPhoto._id %>/comments/<%= comment._id %>/edit">Edit</a>
+                                <form class="delete-form" action="/photos/<%= foundPhoto._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
+                                    <input type="submit" class="btn btn-xs btn-danger" value="Delete">
+                                </form>
+                                <% } %>
                         </div>
                     </div>
-                <% }) %>
+                    <% }) %>
             </div>
         </div>
     </div>

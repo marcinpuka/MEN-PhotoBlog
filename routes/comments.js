@@ -2,10 +2,11 @@
 const   express     = require("express"), 
         router      = express.Router({mergeParams: true}), 
         Photo       = require("../models/photo"),
-        Comment     = require("../models/comment")
+        Comment     = require("../models/comment"), 
+        middleware          = require("../middleware")
 
 
-router.get("/new", isLoggedIn, (req, res) => {
+router.get("/new", middleware.isLoggedIn, (req, res) => {
     Photo.findById(req.params.id, (err, photo) => {
         if (err) {
             console.log(err);
@@ -15,7 +16,7 @@ router.get("/new", isLoggedIn, (req, res) => {
     });
 });
 
-router.post("/", isLoggedIn,(req, res) => {
+router.post("/", middleware.isLoggedIn,(req, res) => {
     Photo.findById(req.params.id, (err, photo) => {
         if (err) {
             console.log(err);
@@ -30,6 +31,7 @@ router.post("/", isLoggedIn,(req, res) => {
                     comment.save();
                     photo.comments.push(comment);
                     photo.save();
+                    req.flash("success", "Comment has been added");
                     res.redirect("/photos/" + photo._id);
                 }
             });
@@ -38,7 +40,7 @@ router.post("/", isLoggedIn,(req, res) => {
 });
 
 //--- EDIT COMMENT ---//
-router.get("/:comment_id/edit", (req,res) => {
+router.get("/:comment_id/edit", middleware.checkCommentOwnership,(req,res) => {
         Comment.findById(req.params.comment_id, (err, comment)=> {
         if(err){
             res.redirect("back");
@@ -48,22 +50,31 @@ router.get("/:comment_id/edit", (req,res) => {
     });
 });
 
+//--- UPDATE ---//
 router.put("/:comment_id", (req, res) => {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
         if(err) {
             res.redirect("back");
         } else {
+            req.flash("success", "Comment has been updated");
+            res.redirect("/photos/" + req.params.id);
+        }
+    });
+});
+
+//--- DELETE ---//
+router.delete("/:comment_id", middleware.checkCommentOwnership,(req, res) => {
+    Comment.findByIdAndRemove(req.params.comment_id, (err) => {
+        if(err){
+          res.redirect("back");  
+        } else {
+            req.flash("success", "Comment has been deleted");
             res.redirect("/photos/" + req.params.id);
         }
     });
 });
 
 
-function isLoggedIn (req, res, next) {
-    if(req.isAuthenticated()){
-        return next();
-    } 
-    res.redirect("/login");
-}
+
 
 module.exports = router;

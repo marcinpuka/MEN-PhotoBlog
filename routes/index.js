@@ -1,7 +1,7 @@
-const   express     = require("express"), 
-        router      = express.Router(), 
-        passport    = require("passport"), 
-        User        = require("../models/user")
+const express = require("express"),
+    router = express.Router(),
+    passport = require("passport"),
+    User = require("../models/user")
 
 
 
@@ -17,13 +17,16 @@ router.get("/register", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-     var newUser = new User({username: req.body.username});
+    var newUser = new User({
+        username: req.body.username
+    });
     User.register(newUser, req.body.password, (err, user) => {
-        if(err){
-            console.log(err);
-            return res.render("register");
-        } 
+        if (err) {
+            //req.flash("error", err.message);
+            return res.render("register", {error: err.message});
+        }
         passport.authenticate("local")(req, res, () => {
+            req.flash("success", "Welcome, " + user.username + "!");
             res.redirect("/photos");
         });
     });
@@ -33,25 +36,32 @@ router.get("/login", (req, res) => {
     res.render("login");
 });
 
-router.post("/login", passport.authenticate("local", 
-    {
-        successRedirect: "/photos", 
-        failureRedirect: "/login"
-    }), (req, res) => {
+//router.post("/login", passport.authenticate("local", 
+//    {
+//        successFlash: "Welcome to PhotoBlog",
+//        successRedirect: "/photos", 
+//        failureFlash: "Invalid username or password", 
+//        failureRedirect: "/login"
+//    }), (req, res) => {
+//            
+//    }
+//);
 
-    }
-);
+router.post("/login", function (req, res, next) {
+    passport.authenticate("local", {
+        successReturnToOrRedirect: "/photos",
+        failureFlash: "Invalid username or password", 
+        failureRedirect: "/login",
+        successFlash: "Nice to have you back, " + req.body.username + "!"
+    })(req, res);
+});
+
 
 router.get("/logout", (req, res) => {
     req.logout();
+    req.flash("success", "You have been logged out.");
     res.redirect("/photos");
 });
 
-function isLoggedIn (req, res, next) {
-    if(req.isAuthenticated()){
-        return next();
-    } 
-    res.redirect("/login");
-}
 
 module.exports = router;
