@@ -43,6 +43,11 @@ body {
   animation-delay: 30s; 
 }
 
+.slideshow li:nth-child(5) { 
+  background-image: url('../img/06.jpg');
+  animation-delay: 40s; 
+}
+
 
 @keyframes imageAnimation { 
   0% { 
