@@ -65,9 +65,9 @@ router.get("/:id", (req, res) => {
 
 //--- EDIT PHOTO ---//
 router.get("/:id/edit", middleware.checkPhotoOwnership, (req, res) => {
-    Campground.findById(req.params.id, (err, foundCampground) => {
-        res.render("campgrounds/edit", {
-            campground: foundCampground
+    Photo.findById(req.params.id, (err, foundPhoto) => {
+        res.render("photos/edit", {
+            foundPhoto: foundPhoto
         });
     });
 });
