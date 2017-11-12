@@ -22,3 +22,12 @@
     padding: 15px;
     color: #777;
 }
+
+#slogan {
+    padding: 0;
+}
+
+#slogan-author {
+    margin-top: -15px;
+    margin-bottom: 25px;
+}
